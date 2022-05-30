@@ -10,7 +10,7 @@
   
   <title>
     
-      About | 
+      Project | 
     
   </title>
   <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -143,53 +143,56 @@
   </div>
 </header>
 
-    <div id="about-banner" style="background-image: url()"></div>
-<div class="author">
-  <div class="head">
-    <img src="/images/vader.svg" />
-  </div>
-  <h3>Michael Shi</h3>
-  
-    <p class="description">Cyber Security Enthusiast｜Red Teaming｜Purple Teaming｜Pentester</p>
-  
-  <section class="share-icons">
-    
-    
-      <a class="icon-twitter" href="https://twitter.com/Michael63766862" target="_blank">
-        <span class="fa-stack fa-lg">
-          <i class="fa fa-circle fa-stack-2x"></i>
-          <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-        </span>
-      </a>
-    
-    
-      <a class="icon-github" href="https://github.com/m10sec" target="_blank">
-        <span class="fa-stack fa-lg">
-          <i class="fa fa-circle fa-stack-2x"></i>
-          <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-        </span>
-      </a>
-    
-    
-    
-    
-  </section>
+    <div id="article-banner">
+  <h2>Projects</h2>
+  <p class="post-date">GitHub Open Source Projects</p>
 </div>
-
+<main class="app-body project-app">
+  <div class="card-container" id="all-project"></div>
+</main>
 <script>
-  (function () {
+  (function() {
+    var url = 'http://example.com/project/index.html';
+    $('#article-banner').geopattern(url);
     $('.header').removeClass('fixed-header')
-    var windowH = $(window).height();
-    var author = $('.author')
-    var bodyH = author.offset().top + author[0].offsetHeight + 71;
-    if (bodyH < windowH) {
-      author.css({
-        'margin-bottom': windowH - bodyH
-      })
-    }
-  })();
+    $.ajax({
+      headers: {
+        Accept: 'application/vnd.github.v3.raw'
+      },
+      type: 'get',
+      url: 'https://api.github.com/users/m10sec/repos',
+      success: function (data) {
+        var repos = data.sort(function(a, b) {
+          return (b.stargazers_count - a.stargazers_count)
+        }).slice(0, 6)
+        var cardHtml = repos.map(function(item) {
+          var description = item.description || ""
+          if (description.replace(/[\u0391-\uFFE5]/g, "aa").length > 72) {
+            description = description.slice(0, 72) + '...'
+          }
+          return (
+            '<section class="project-card">' + 
+              '<a class="card-wrap" href="'+ item.html_url +'" target="_blank">' +
+                '<div class="card-header" data-name="'+ item.name +'"></div>' +
+                '<h3 class="card-title">' + item.name + '</h3>' +
+                '<p class="card-description">' + description + '</p>' +
+                '<div class="card-footer">' +
+                  '<span><i class="fa fa-star"></i>'+ item.stargazers_count +'</span>' +
+                  '<span><i class="fa fa-code-fork"></i>' + item.forks_count +'</span>' +
+                '</div>' +
+              '</a>' +
+            '</section>'
+          )
+        }).join('')
+        $('#all-project').html(cardHtml)
+        $('.card-header').each(function() {
+          var name = $(this).data('name');
+          $(this).geopattern(name);
+        })
+      }
+    });
+  })()
 </script>
-
     <div class="scroll-top">
   <span class="arrow-icon"></span>
 </div>
